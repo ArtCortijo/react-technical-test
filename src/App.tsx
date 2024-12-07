@@ -24,13 +24,13 @@ export const App: React.FC = () => {
 				{/* <VisiblePoints /> */}
 			</div>
 			<div
-				// style={{
-				// 	width: '50vw',
-				// 	height: '100vh',
-				// }}
-				className=''
+			// style={{
+			// 	width: '50vw',
+			// 	height: '100vh',
+			// }}
 			>
 				<ReactMapBoxGl />
+				<VisiblePoints />
 			</div>
 		</div>
 	);

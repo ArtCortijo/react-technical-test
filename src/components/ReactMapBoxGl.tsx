@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import filter_points_worker_script from '../filterPoints.worker';
+import { useVisiblePointsStore } from '../stores/visiblePoints';
 import Map, { NavigationControl, MapRef, Source, Layer } from 'react-map-gl';
 import type { LayerProps } from 'react-map-gl';
 import type { Feature, FeatureCollection } from 'geojson';
@@ -11,15 +12,11 @@ const INITIAL_CENTER: [number, number] = [2.348392, 48.853495];
 const INITIAL_ZOOM: number = 9;
 const MAPBOX_TOKEN = process.env.REACT_APP_MAP_TOKEN;
 
-interface GeoJSONFeatureProperties {
-	[key: string]: any; // Adjust based on your GeoJSON properties structure
-}
-
 const ReactMapBoxGl = () => {
 	const [pointsData, setPointsData] = useState<FeatureCollection | null>(null);
-	const [visiblePoints, setVisiblePoints] = useState<
-		GeoJSONFeatureProperties[]
-	>([]);
+	const setVisiblePoints = useVisiblePointsStore(
+		(state) => state.setVisiblePoints
+	);
 	const mapRef = useRef<MapRef>(null);
 
 	// Configure a map centered on Paris
@@ -47,10 +44,17 @@ const ReactMapBoxGl = () => {
 				layers: ['point'],
 			}) as Feature[];
 
-			const visiblePointsArray = features
-				.map((feature) => feature.properties)
-				.filter(Boolean) as GeoJSONFeatureProperties[];
+			const visiblePointsArray: Feature[] = features
+				.map(
+					(feature): Feature => ({
+						type: 'Feature',
+						properties: feature.properties,
+						geometry: feature.geometry,
+					})
+				)
+				.filter((item) => item.properties && item.geometry);
 
+			// Update the Zustand store with visible points
 			setVisiblePoints(visiblePointsArray);
 		}
 	};
@@ -139,33 +143,6 @@ const ReactMapBoxGl = () => {
 					</Source>
 					<NavigationControl position='top-right' />
 				</Map>
-
-				{/* Points listing */}
-				<div className='visible-points-panel p-4 border-t'>
-					<h3 className='text-lg font-bold pb-4'>
-						Visible Points: <span>{visiblePoints.length}</span>
-					</h3>
-					{visiblePoints.length > 0 ? (
-						<ul
-							style={{
-								display: 'grid',
-								gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-							}}
-						>
-							{visiblePoints.map((point, i) => (
-								<li key={i} className='p-2 border-solid border'>
-									{Object.entries(point).map(([key, value]) => (
-										<div key={key}>
-											<strong>{key}:</strong> {value}
-										</div>
-									))}
-								</li>
-							))}
-						</ul>
-					) : (
-						<p>No visible points.</p>
-					)}
-				</div>
 			</div>
 		</>
 	);

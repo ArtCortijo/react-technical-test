@@ -6,7 +6,6 @@ declare const self: DedicatedWorkerGlobalScope;
 const workerFunction = function () {
 	self.onmessage = (event: MessageEvent) => {
 		const points = event.data;
-		console.log('Worker received data:', points);
 		if (!points || !Array.isArray(points.features)) {
 			postMessage(null);
 			return;
