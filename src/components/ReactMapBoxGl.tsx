@@ -14,12 +14,16 @@ const MAPBOX_TOKEN = process.env.REACT_APP_MAP_TOKEN;
 
 const ReactMapBoxGl = () => {
 	const [pointsData, setPointsData] = useState<FeatureCollection | null>(null);
+	const mapRef = useRef<MapRef>(null);
+
+	// Zustand state management hooks
 	const setVisiblePoints = useVisiblePointsStore(
 		(state) => state.setVisiblePoints
 	);
-	const mapRef = useRef<MapRef>(null);
+	const hightLightPointId = useVisiblePointsStore(
+		(state) => state.hightLightPointId
+	);
 
-	// Configure a map centered on Paris
 	const [viewport, setViewport] = useState({
 		longitude: INITIAL_CENTER[0],
 		latitude: INITIAL_CENTER[1],
@@ -40,7 +44,6 @@ const ReactMapBoxGl = () => {
 	const handleVisiblePoints = () => {
 		if (mapRef.current) {
 			const features = mapRef.current.queryRenderedFeatures({
-				// Layer id
 				layers: ['point'],
 			}) as Feature[];
 
@@ -50,6 +53,7 @@ const ReactMapBoxGl = () => {
 						type: 'Feature',
 						properties: feature.properties,
 						geometry: feature.geometry,
+						id: feature.properties?.id,
 					})
 				)
 				.filter((item) => item.properties && item.geometry);
@@ -79,14 +83,48 @@ const ReactMapBoxGl = () => {
 				worker.postMessage(data);
 				// Listen for the filtered data from the worker
 				worker.onmessage = (event) => {
+					// Features IDs
+					event.data.features.forEach((feature: any, index: number) => {
+						feature.id = feature.properties?.id || `point-${index}`;
+					});
 					setPointsData(event.data);
+
 					worker.terminate();
 				};
 			})
 			.catch((error) => {
 				console.error('Error fetching points.geojson:', error);
 			});
+
+		return () => {};
 	}, []);
+
+	// Bonus : Highlight clicked point
+	useEffect(() => {
+		if (!hightLightPointId && !mapRef.current) return;
+
+		//Reset previously highlighted point
+		pointsData?.features.forEach((feature) => {
+			mapRef.current?.setFeatureState(
+				{
+					source: 'test-points-data',
+					id: String(feature.id),
+				},
+				{ highlight: false }
+			);
+		});
+
+		// Highlight clicked point
+		mapRef.current?.setFeatureState(
+			{
+				source: 'test-points-data',
+				id: String(hightLightPointId),
+			},
+			{
+				highlight: true,
+			}
+		);
+	}, [hightLightPointId, pointsData]);
 
 	const layerStyle: LayerProps = {
 		id: 'point',
@@ -94,7 +132,14 @@ const ReactMapBoxGl = () => {
 		source: 'test-points-data',
 		paint: {
 			'circle-radius': 10,
-			'circle-color': '#007cbf',
+			'circle-color': [
+				'case',
+				['boolean', ['feature-state', 'highlight'], false],
+				// Highlighted color
+				'#FF0000',
+				// Default color
+				'#007cbf',
+			],
 		},
 	};
 

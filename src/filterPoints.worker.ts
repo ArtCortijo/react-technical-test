@@ -1,10 +1,11 @@
 /// <reference lib="webworker" />
+import type { FeatureCollection } from 'geojson';
 
 // Declare the worker's global scope
 declare const self: DedicatedWorkerGlobalScope;
 
 const workerFunction = function () {
-	self.onmessage = (event: MessageEvent) => {
+	self.onmessage = (event: MessageEvent<FeatureCollection>) => {
 		const points = event.data;
 		if (!points || !Array.isArray(points.features)) {
 			postMessage(null);
@@ -12,7 +13,7 @@ const workerFunction = function () {
 		}
 
 		// Filter points where latitude > 48.8534
-		const filteredPoints = {
+		const filteredPoints: FeatureCollection = {
 			...points,
 			features: points.features.filter(
 				(feature: any) => feature.geometry.coordinates[1] > 48.8534

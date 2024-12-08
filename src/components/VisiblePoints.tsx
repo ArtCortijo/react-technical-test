@@ -1,8 +1,14 @@
-import { useEffect } from 'react';
 import { useVisiblePointsStore } from '../stores/visiblePoints';
 
 const VisiblePoints = () => {
 	const visiblePoints = useVisiblePointsStore((state) => state.visiblePoints);
+	const setHighlightedPointId = useVisiblePointsStore(
+		(state) => state.setHightLightedPointId
+	);
+
+	const handlePointClick = (id: string) => {
+		setHighlightedPointId(id);
+	};
 
 	return (
 		<div className='visible-points-panel p-4 border-t'>
@@ -21,11 +27,27 @@ const VisiblePoints = () => {
 							<div className='properties mb-4'>
 								<h4 className='font-bold'>Properties:</h4>
 								{point.properties ? (
-									Object.entries(point.properties).map(([key, value]) => (
-										<p key={key}>
-											{key}: {String(value)}
-										</p>
-									))
+									Object.entries(point.properties).map(([key, value]) => {
+										if (key === 'name') {
+											return (
+												<button
+													key={key}
+													onClick={() => {
+														handlePointClick(String(point.id));
+													}}
+												>
+													<p key={key}>
+														{key}: {String(value)}
+													</p>
+												</button>
+											);
+										}
+										return (
+											<p key={key}>
+												{key}: {String(value)}
+											</p>
+										);
+									})
 								) : (
 									<p>No properties available</p>
 								)}
