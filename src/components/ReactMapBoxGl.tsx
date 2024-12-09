@@ -9,10 +9,11 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 // https://docs.mapbox.com/help/getting-started/geocoding/#geocoding-demo
 // Task 2 - Configure a map centered on Paris.
 const INITIAL_CENTER: [number, number] = [2.348392, 48.853495];
-const INITIAL_ZOOM: number = 9;
+const INITIAL_ZOOM: number = 11;
 const MAPBOX_TOKEN = process.env.REACT_APP_MAP_TOKEN;
 
 const ReactMapBoxGl = () => {
+	const [isMapLoaded, setIsMapLoaded] = useState(false);
 	const [pointsData, setPointsData] = useState<FeatureCollection | null>(null);
 	const mapRef = useRef<MapRef>(null);
 
@@ -40,9 +41,14 @@ const ReactMapBoxGl = () => {
 		}
 	};
 
+	// Trying to avoid 'Style is not done loading' error
+	const handleMapLoad = () => {
+		setIsMapLoaded(true);
+	};
+
 	// Task 3 - On button click, use queryRenderedFeatures to list the visible points in a panel below the map.
 	const handleVisiblePoints = () => {
-		if (mapRef.current) {
+		if (isMapLoaded && mapRef.current) {
 			const features = mapRef.current.queryRenderedFeatures({
 				layers: ['point'],
 			}) as Feature[];
@@ -156,13 +162,13 @@ const ReactMapBoxGl = () => {
 						className='reset-button p-2 bg-slate-950 bg-opacity-80 rounded-md'
 						onClick={handleResetCenter}
 					>
-						Réinitialiser
+						Recenter
 					</button>
 					<button
 						className='reset-button p-2 bg-slate-950 bg-opacity-80 rounded-md'
 						onClick={handleVisiblePoints}
 					>
-						Afficher les points visibles
+						Show visible points
 					</button>
 				</div>
 
@@ -182,6 +188,7 @@ const ReactMapBoxGl = () => {
 					// https://docs.mapbox.com/api/maps/styles/
 					mapStyle='mapbox://styles/mapbox/streets-v11'
 					mapboxAccessToken={MAPBOX_TOKEN}
+					onLoad={handleMapLoad}
 				>
 					<Source id='test-points-data' type='geojson' data={pointsData}>
 						<Layer {...layerStyle} />

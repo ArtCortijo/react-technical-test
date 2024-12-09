@@ -2,6 +2,9 @@ import { useVisiblePointsStore } from '../stores/visiblePoints';
 
 const VisiblePoints = () => {
 	const visiblePoints = useVisiblePointsStore((state) => state.visiblePoints);
+	const highLightedPointId = useVisiblePointsStore(
+		(state) => state.hightLightPointId
+	);
 	const setHighlightedPointId = useVisiblePointsStore(
 		(state) => state.setHightLightedPointId
 	);
@@ -31,6 +34,11 @@ const VisiblePoints = () => {
 										if (key === 'name') {
 											return (
 												<button
+													className={`ease-in-out duration-300 border-b hover:border-b-red-500 hover:text-red-500 ${
+														String(point.id) === highLightedPointId
+															? 'border-b-red-500 text-red-500'
+															: 'border-b-gray-300 text-gray-300'
+													}`}
 													key={key}
 													onClick={() => {
 														handlePointClick(String(point.id));
