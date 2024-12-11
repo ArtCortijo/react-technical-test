@@ -88,7 +88,7 @@ const MapGl = () => {
 
 		const fetchPointsData = async () => {
 			try {
-				const response = await fetch('/points.geojson');
+				const response = await fetch('/data/points.geojson');
 				if (!response.ok) {
 					throw new Error('Network response was not ok');
 				}
