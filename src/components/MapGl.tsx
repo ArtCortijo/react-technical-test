@@ -3,7 +3,12 @@ import filter_points_worker_script from '../filterPoints.worker';
 import { useVisiblePointsStore } from '../stores/visiblePointsStore';
 import Map, { NavigationControl, MapRef, Source, Layer } from 'react-map-gl';
 import type { LayerProps } from 'react-map-gl';
-import type { Feature, FeatureCollection } from 'geojson';
+import type {
+	Feature,
+	FeatureCollection,
+	Geometry,
+	GeoJsonProperties,
+} from 'geojson';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import VisiblePointsListing from './VisiblePointsListing';
 
@@ -54,17 +59,18 @@ const MapGl = () => {
 		try {
 			const visibleFeatures = mapRef.current.queryRenderedFeatures({
 				layers: ['points-layer'],
-			}) as Feature[];
-			const visiblePointsArray: Feature[] = visibleFeatures
-				.map(
-					(feature): Feature => ({
-						type: 'Feature',
-						properties: feature.properties,
-						geometry: feature.geometry,
-						id: feature.properties?.id,
-					})
-				)
-				.filter((item) => item.properties && item.geometry);
+			}) as Feature<Geometry, GeoJsonProperties>[];
+			const visiblePointsArray: Feature<Geometry, GeoJsonProperties>[] =
+				visibleFeatures
+					.map(
+						(feature): Feature => ({
+							type: 'Feature',
+							properties: feature.properties,
+							geometry: feature.geometry,
+							id: feature.properties?.id,
+						})
+					)
+					.filter((item) => item.properties && item.geometry);
 
 			// Update the Zustand store with visible points
 			setVisiblePoints(visiblePointsArray);
