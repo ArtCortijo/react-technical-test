@@ -77,7 +77,7 @@ const MapGl = () => {
 	useEffect(() => {
 		if (!isMapLoaded || !mapRef.current) return;
 
-		// 4 - Web Workers:
+		// Task 4 - Web Worker
 		const worker = new Worker(filter_points_worker_script);
 
 		const fetchPointsData = async () => {
