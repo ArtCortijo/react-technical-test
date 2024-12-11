@@ -1,8 +1,6 @@
-import React from 'react';
-import ReactMapBoxGl from './components/ReactMapBoxGl';
-import VisiblePoints from './components/VisiblePoints';
+import MapGl from './components/MapGl';
 
-export const App: React.FC = () => {
+export const App = () => {
 	return (
 		<div className='w-full h-screen'>
 			<div className=' p-4'>
@@ -10,8 +8,7 @@ export const App: React.FC = () => {
 				<h4>By Arturo Cortijo Purizaca</h4>
 			</div>
 			<div>
-				<ReactMapBoxGl />
-				<VisiblePoints />
+				<MapGl />
 			</div>
 		</div>
 	);
