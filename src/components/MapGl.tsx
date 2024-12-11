@@ -171,12 +171,12 @@ const MapGl = () => {
 			<div className='relative'>
 				<div className='p-4 flex gap-3'>
 					{/* Coordinates and zoom info */}
-					<div className='sidebar p-2 bg-slate-950 bg-opacity-80 rounded-md'>
+					<div className='sidebar p-2 rounded-md'>
 						Longitude: {viewport.longitude.toFixed(4)} | Latitude:{' '}
 						{viewport.latitude.toFixed(4)} | Zoom: {viewport.zoom.toFixed(2)}
 					</div>
 					<button
-						className='reset-button p-2 bg-slate-950 bg-opacity-80 rounded-md'
+						className='ease-in-out duration-300 reset-button p-2 bg-slate-950 bg-opacity-80 rounded-md hover:bg-gray-300 hover:text-slate-950'
 						onClick={handleResetCenter}
 					>
 						Recenter

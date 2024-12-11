@@ -21,7 +21,7 @@ const VisiblePointsListing = ({ handleVisiblePoints }: VisiblePointsProps) => {
 	return (
 		<div className='visible-points-panel p-4 border-t'>
 			<button
-				className='show-visible-points p-2 bg-slate-950 bg-opacity-80 rounded-md'
+				className='ease-in-out duration-300 show-visible-points p-2 bg-slate-950 bg-opacity-80 rounded-md hover:bg-gray-300 hover:text-slate-950'
 				onClick={handleVisiblePoints}
 			>
 				Show visible points
